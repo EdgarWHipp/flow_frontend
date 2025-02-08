@@ -33,10 +33,10 @@ const LoadingScreen = ({ isVisible }) => {
       }`}
     >
       <div className={`flex flex-col items-center transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
+        isVisible ? 'opacity-50' : 'opacity-25'
       }`}>
        
-        <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+        <Loader2 className="h-6 w-6 text-black-600 animate-spin" />
       </div>
     </div>
   );
