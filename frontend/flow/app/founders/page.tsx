@@ -98,7 +98,7 @@ export default function FoundersPage() {
       <footer className="bg-black text-white py-8 w-full">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-4">
-            <span className="font-instrument-serif text-xl font-bold">flow</span>
+            
             <nav className="flex gap-6">
               <Link href="/about" className="hover:underline">
                 About
