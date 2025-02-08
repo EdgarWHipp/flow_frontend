@@ -289,26 +289,24 @@ export default function LandingPage() {
                 <h2 className="text-2xl font-bold mb-6 text-center">Available flows</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {recommendations.map((recommendation) => (
-                    <div key={recommendation.id} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+                    <Link 
+                      key={recommendation.id}
+                      href={`/flow/${recommendation.id}`}
+                      className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow transform hover:scale-105"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.body.style.overflow = 'hidden';
+                        setTimeout(() => {
+                          window.location.href = `/flow/${recommendation.id}`;
+                        }, 300);
+                      }}
+                    >
                       <h3 className="text-lg font-semibold mb-2">{recommendation.title}</h3>
                       <p className="text-sm text-gray-600">{recommendation.description}</p>
                       <div className="mt-2 text-sm text-green-600">
                         Potential savings: €{recommendation.potentialSavings}
                       </div>
-                      <Link 
-                        href={`/flow/${recommendation.id}`}
-                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          document.body.style.overflow = 'hidden';
-                          setTimeout(() => {
-                            window.location.href = `/flow/${recommendation.id}`;
-                          }, 300);
-                        }}
-                      >
-                        View Flow
-                      </Link>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
