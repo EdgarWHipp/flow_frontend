@@ -4,6 +4,79 @@ import { useState, useEffect, useRef, DragEvent, ChangeEvent } from "react"
 import Link from "next/link"
 import { Upload, FileText, X, ChevronDown } from "lucide-react"
 import LoadingBar from "../components/LoadingBar"
+import { Recommendation } from '../types/api'
+
+// Add mock data constant
+const MOCK_RECOMMENDATIONS: Recommendation[] = [
+  {
+    id: "1",
+    title: "Kirchensteuer Optimierung",
+    description: "Durch Anpassung Ihrer Kirchenzugehörigkeit können Sie potenziell Steuern sparen.",
+    priority: 1,
+    potentialSavings: 1200,
+    relatedFlows: [
+      {
+        id: "flow1",
+        name: "Kirchensteuer Analyse",
+        description: "Analysieren Sie Ihre Kirchensteuer-Situation",
+        steps: ["Dokumentenprüfung", "Berechnung", "Empfehlung"],
+        requirements: ["Steuerbescheid", "Personaldokumente"]
+      }
+    ]
+  },
+  {
+    id: "2",
+    title: "Steuerklassen Optimierung",
+    description: "Eine Änderung der Steuerklasse könnte zu einer besseren monatlichen Liquidität führen.",
+    priority: 2,
+    potentialSavings: 2400,
+    relatedFlows: [
+      {
+        id: "flow2",
+        name: "Steuerklassen Check",
+        description: "Überprüfen Sie die optimale Steuerklasse",
+        steps: ["Einkommensanalyse", "Vergleichsrechnung", "Empfehlung"],
+        requirements: ["Gehaltsnachweis", "Familienstand"]
+      }
+    ]
+  },
+  {
+    id: "3",
+    title: "Wohnsitz Optimierung",
+    description: "Durch geschickte Wahl Ihres Hauptwohnsitzes können Sie Steuern optimieren.",
+    priority: 3,
+    potentialSavings: 3600,
+    relatedFlows: [
+      {
+        id: "flow3",
+        name: "Wohnsitz Analyse",
+        description: "Analysieren Sie Ihre Wohnsitzsituation",
+        steps: ["Standortanalyse", "Kostenvergleich", "Empfehlung"],
+        requirements: ["Mietvertrag", "Arbeitgeberbescheinigung"]
+      }
+    ]
+  }
+];
+
+// Add environment check (you can set this in your .env file)
+const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
+// Add mock API function
+const getMockRecommendations = async (): Promise<Recommendation[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return MOCK_RECOMMENDATIONS;
+};
+
+// Utility function to convert File to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve((reader.result as string).split(',')[1]);
+    reader.onerror = error => reject(error);
+  });
+};
 
 export default function LandingPage() {
   const [file, setFile] = useState<File | null>(null)
@@ -12,6 +85,7 @@ export default function LandingPage() {
   const [isUseCasesOpen, setIsUseCasesOpen] = useState(false)
   const [userDescription, setUserDescription] = useState("")
   const useCasesRef = useRef<HTMLDivElement>(null)
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -35,32 +109,77 @@ export default function LandingPage() {
     setIsDragging(false)
   }
 
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    setIsDragging(false)
-    const droppedFile = e.dataTransfer.files[0]
-    setFile(droppedFile)
-    setIsLoading(true)
-    // Simulating file analysis delay
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 5000) // 5 seconds delay for demonstration
-  }
+  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedFile = e.dataTransfer.files[0];
+    setFile(droppedFile);
+    if (droppedFile) {
+      await handleFileUpload(droppedFile);
+    }
+  };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] || null
-    setFile(selectedFile)
-    setIsLoading(true)
-    // Simulating file analysis delay
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 5000) // 5 seconds delay for demonstration
-  }
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+    setFile(selectedFile);
+    if (selectedFile) {
+      await handleFileUpload(selectedFile);
+    }
+  };
 
   const removeFile = () => {
     setFile(null)
     setIsLoading(false)
   }
+
+  const handleFileUpload = async (fileToUpload: File) => {
+    setIsLoading(true);
+    try {
+      if (IS_MOCK) {
+        // Use mock data with artificial delay
+        const mockData = await getMockRecommendations();
+        setRecommendations(mockData);
+      } else {
+        // Upload document first
+        const base64Content = await fileToBase64(fileToUpload);
+        const uploadResponse = await fetch('/api/documents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: fileToUpload.type,
+            content: base64Content,
+            metadata: {
+              filename: fileToUpload.name,
+              uploadedAt: new Date().toISOString(),
+              mimeType: fileToUpload.type,
+            },
+          }),
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Document upload failed');
+        }
+
+        const { documentId } = await uploadResponse.json();
+
+        // Then get recommendations
+        const recommendationsResponse = await fetch(`/api/recommendations?documentId=${documentId}`);
+        if (!recommendationsResponse.ok) {
+          throw new Error('Failed to fetch recommendations');
+        }
+
+        const recommendationsData = await recommendationsResponse.json();
+        setRecommendations(recommendationsData);
+      }
+    } catch (error) {
+      console.error('Error processing file:', error);
+      // Fallback to mock data if API fails
+      const mockData = await getMockRecommendations();
+      setRecommendations(mockData);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen flex flex-col bg-[#f3f1ea]">
@@ -198,10 +317,13 @@ export default function LandingPage() {
             <div className="mt-12">
               <h2 className="text-2xl font-bold mb-6">Available flows</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {["Kirchensteuer", "Steuerklassenänderung", "Wohnsitzoptimierung"].map((flow, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-                    <h3 className="text-lg font-semibold mb-2">{flow}</h3>
-                    <p className="text-sm text-gray-600">Description for {flow}</p>
+                {recommendations.map((recommendation) => (
+                  <div key={recommendation.id} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+                    <h3 className="text-lg font-semibold mb-2">{recommendation.title}</h3>
+                    <p className="text-sm text-gray-600">{recommendation.description}</p>
+                    <div className="mt-2 text-sm text-green-600">
+                      Potential savings: €{recommendation.potentialSavings}
+                    </div>
                     <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                       View Flow
                     </button>
