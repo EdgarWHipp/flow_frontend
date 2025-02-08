@@ -11,6 +11,7 @@ module.exports = {
     extend: {
       animation: {
         wave: "wave 2.5s ease-in-out infinite",
+        'fade-in': 'fadeIn 0.5s ease-out forwards',
       },
       keyframes: {
         wave: {
@@ -19,6 +20,10 @@ module.exports = {
           "40%": { transform: "rotate(-10deg)" },
           "60%": { transform: "rotate(10deg)" },
           "80%": { transform: "rotate(-20deg)" },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
       },
       colors: {
