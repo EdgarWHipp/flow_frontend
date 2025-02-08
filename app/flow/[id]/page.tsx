@@ -11,11 +11,18 @@ import { motion, AnimatePresence } from "framer-motion"
 // Add environment check
 const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
+interface CachedDocument {
+  file: File;
+  documentId: string;
+  timestamp: number;
+}
+
 export default function FlowPage() {
   const params = useParams()
   const [flow, setFlow] = useState<Recommendation | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedStep, setSelectedStep] = useState<number | null>(null)
+  const [documentCache, setDocumentCache] = useState<CachedDocument | null>(null)
 
   useEffect(() => {
     const fetchFlow = async () => {
@@ -46,8 +53,83 @@ export default function FlowPage() {
     fetchFlow()
   }, [params.id])
 
+  // Load cached document on component mount
+  useEffect(() => {
+    const cachedData = localStorage.getItem('documentCache')
+    if (cachedData) {
+      const parsed = JSON.parse(cachedData)
+      // Check if cache is less than 24 hours old
+      if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+        setDocumentCache(parsed)
+      } else {
+        // Clear expired cache
+        localStorage.removeItem('documentCache')
+      }
+    }
+  }, [])
+
   const handleStepClick = (index: number) => {
     setSelectedStep(selectedStep === index ? null : index)
+  }
+
+  const handleFileUpload = async (fileToUpload: File) => {
+    setIsLoading(true);
+    try {
+      if (IS_MOCK) {
+        const mockData = await getMockRecommendations();
+        setRecommendations(mockData);
+      } else {
+        const base64Content = await fileToBase64(fileToUpload);
+        const uploadResponse = await fetch('/api/documents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: fileToUpload.type,
+            content: base64Content,
+            metadata: {
+              filename: fileToUpload.name,
+              uploadedAt: new Date().toISOString(),
+              mimeType: fileToUpload.type,
+            },
+          }),
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Document upload failed');
+        }
+
+        const { documentId } = await uploadResponse.json();
+
+        // Cache the document data
+        const cacheData: CachedDocument = {
+          file: fileToUpload,
+          documentId,
+          timestamp: Date.now()
+        }
+        localStorage.setItem('documentCache', JSON.stringify(cacheData))
+        setDocumentCache(cacheData)
+
+        const recommendationsResponse = await fetch(`/api/recommendations?documentId=${documentId}`);
+        if (!recommendationsResponse.ok) {
+          throw new Error('Failed to fetch recommendations');
+        }
+
+        const recommendationsData = await recommendationsResponse.json();
+        setRecommendations(recommendationsData);
+      }
+    } catch (error) {
+      console.error('Error processing file:', error);
+      const mockData = await getMockRecommendations();
+      setRecommendations(mockData);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add a function to clear the cache
+  const clearDocumentCache = () => {
+    localStorage.removeItem('documentCache')
+    setDocumentCache(null)
   }
 
   const StepContent = ({ step, requirements }: { step: string, requirements: string[] }) => (
@@ -204,6 +286,19 @@ export default function FlowPage() {
           </div>
         </div>
       </div>
+
+      {/* Add this somewhere in your UI if you want to show cached document info */}
+      {documentCache && (
+        <div className="text-sm text-gray-600 mt-2">
+          Using cached document: {documentCache.file.name}
+          <button 
+            onClick={clearDocumentCache}
+            className="ml-2 text-red-500 hover:text-red-700"
+          >
+            Clear Cache
+          </button>
+        </div>
+      )}
     </main>
   )
 } 
