@@ -216,7 +216,7 @@ export default function FlowPage() {
               <div className="sticky top-24 h-[calc(100vh-8rem)] flex items-center">
                 <div className="relative w-full">
                   <AnimatePresence>
-                    {flow.relatedFlows[0]?.return && (
+                    {flow.relatedFlows[0]?.message && (
                       <motion.div
                         key="single-step"
                         initial={{ opacity: 0, y: 50 }}
@@ -247,7 +247,7 @@ export default function FlowPage() {
                               1
                             </div>
                             <p className="ml-4 font-medium text-gray-800">
-                              {flow.relatedFlows[0].return}
+                              {flow.relatedFlows[0].message}
                             </p>
                           </div>
                         </button>
@@ -262,8 +262,8 @@ export default function FlowPage() {
             <div className="flex-1">
               {selectedStep !== null ? (
                 <StepContent 
-                  step={flow.relatedFlows[0]?.return}
-                  requirements={flow.relatedFlows[0]?.requirements}
+                  step={flow.relatedFlows[0]?.message || ''}
+                  requirements={flow.relatedFlows[0]?.requirements || []}
                 />
               ) : (
                 <div className="bg-white rounded-lg p-6 shadow-md">
