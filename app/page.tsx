@@ -33,9 +33,8 @@ const LoadingScreen = ({ isVisible }) => {
       }`}
     >
       <div className={`flex flex-col items-center transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-25'
+        isVisible ? 'opacity-100' : 'opacity-0'
       }`}>
-       
         <Loader2 className="h-10 w-10 text-black-600 animate-spin" />
       </div>
     </div>
@@ -64,6 +63,7 @@ export default function LandingPage() {
   const [userDescription, setUserDescription] = useState("")
   const useCasesRef = useRef<HTMLDivElement>(null)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -96,7 +96,6 @@ export default function LandingPage() {
       await handleFileUpload(droppedFile);
     }
   };
-
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     setFile(selectedFile);
@@ -155,6 +154,43 @@ export default function LandingPage() {
     }
   };
 
+  useEffect(() => {
+    if (!isLoading && file && recommendations.length > 0) {
+      console.log('Loading complete, checking for flows section...');
+      const scrollTimeout = setTimeout(() => {
+        const flowsSection = document.getElementById('available-flows');
+        if (flowsSection) {
+          console.log('Found flows section, scrolling...');
+          const headerHeight = 66;
+          const elementPosition = flowsSection.offsetTop - headerHeight;
+          
+          window.scrollTo({
+            top: elementPosition,
+            behavior: 'smooth'
+          });
+        } else {
+          console.log('Flows section not found');
+        }
+      }, 100);
+
+      return () => clearTimeout(scrollTimeout);
+    }
+  }, [isLoading, file, recommendations]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const flowsSection = document.getElementById('available-flows');
+      if (flowsSection) {
+        const sectionTop = flowsSection.offsetTop;
+        const scrollPosition = window.scrollY + window.innerHeight / 2;
+        setIsScrolledDown(scrollPosition > sectionTop);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <main className="min-h-screen flex flex-col bg-[#f3f1ea]">
       <LoadingScreen isVisible={isLoading} />
@@ -181,7 +217,6 @@ export default function LandingPage() {
           </div>
         </div>
       </header>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center bg-[#f3f1ea] pt-[66px]">
         <div className="w-full max-w-4xl mx-auto px-4 py-16">
@@ -205,73 +240,77 @@ export default function LandingPage() {
           </div>
 
           {/* File Upload Area */}
-          <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+          <div 
+            className={`transition-opacity duration-500 ${
+              isScrolledDown ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
           >
-            {!file ? (
-              <>
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <p className="mt-4 text-lg font-semibold">Drag and drop your file here, or click to select</p>
-                <p className="mt-2 text-sm text-gray-500">Upload your PDFs, Excel sheets, or Obsidian.md files</p>
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  id="fileInput"
-                  accept=".pdf,.xlsx,.xls,.md"
-                />
-                <label
-                  htmlFor="fileInput"
-                  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
-                >
-                  Select File
-                </label>
-              </>
-            ) : (
-              <div className="flex items-center justify-between bg-white p-4 rounded-md">
-                <div className="flex items-center">
-                  <FileText className="h-8 w-8 text-blue-500 mr-3" />
-                  <span className="font-medium">{file.name}</span>
+            <div className="border-2 border-dashed rounded-lg p-8 text-center transition-colors">
+              {!file ? (
+                <>
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <p className="mt-4 text-lg font-semibold">Drag and drop your file here, or click to select</p>
+                  <p className="mt-2 text-sm text-gray-500">Upload your PDFs, Excel sheets, or Obsidian.md files</p>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                    id="fileInput"
+                    accept=".pdf,.xlsx,.xls,.md"
+                  />
+                  <label
+                    htmlFor="fileInput"
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                  >
+                    Select File
+                  </label>
+                </>
+              ) : (
+                <div className="flex items-center justify-between bg-white p-4 rounded-md">
+                  <div className="flex items-center">
+                    <FileText className="h-8 w-8 text-blue-500 mr-3" />
+                    <span className="font-medium">{file.name}</span>
+                  </div>
+                  <button onClick={removeFile} className="text-red-500 hover:text-red-700">
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
-                <button onClick={removeFile} className="text-red-500 hover:text-red-700">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Available Flows Section */}
           {file && !isLoading && (
-            <div className="mt-12">
-              <h2 className="text-2xl font-bold mb-6">Available flows</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {recommendations.map((recommendation) => (
-                  <div key={recommendation.id} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-                    <h3 className="text-lg font-semibold mb-2">{recommendation.title}</h3>
-                    <p className="text-sm text-gray-600">{recommendation.description}</p>
-                    <div className="mt-2 text-sm text-green-600">
-                      Potential savings: €{recommendation.potentialSavings}
+            <div 
+              id="available-flows"
+              className="mt-12 opacity-0 animate-fade-in min-h-[150vh] flex flex-col justify-center pb-[50vh]"
+            >
+              <div className="container mx-auto px-4">
+                <h2 className="text-2xl font-bold mb-6 text-center">Available flows</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {recommendations.map((recommendation) => (
+                    <div key={recommendation.id} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+                      <h3 className="text-lg font-semibold mb-2">{recommendation.title}</h3>
+                      <p className="text-sm text-gray-600">{recommendation.description}</p>
+                      <div className="mt-2 text-sm text-green-600">
+                        Potential savings: €{recommendation.potentialSavings}
+                      </div>
+                      <Link 
+                        href={`/flow/${recommendation.id}`}
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.body.style.overflow = 'hidden';
+                          setTimeout(() => {
+                            window.location.href = `/flow/${recommendation.id}`;
+                          }, 300);
+                        }}
+                      >
+                        View Flow
+                      </Link>
                     </div>
-                    <Link 
-                      href={`/flow/${recommendation.id}`}
-                      className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        document.body.style.overflow = 'hidden'
-                        setTimeout(() => {
-                          window.location.href = `/flow/${recommendation.id}`
-                        }, 300)
-                      }}
-                    >
-                      View Flow
-                    </Link>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
