@@ -44,17 +44,17 @@ export default function UseCasesPage() {
               <div className="text-center">
                 
                 <h3 className="font-bold mb-2">Upload Documents</h3>
-                <p className="text-gray-600">Simply upload your financial documents - from tax returns to business reports</p>
+                <p className="text-gray-600">Upload your financial documents - from tax returns to business reports</p>
               </div>
               <div className="text-center">
                
-                <h3 className="font-bold mb-2">AI Analysis</h3>
-                <p className="text-gray-600">Our expert system analyzes your documents using German financial regulations</p>
+                <h3 className="font-bold mb-2">Analysis</h3>
+                <p className="text-gray-600">Our system analyzes your documents using German financial regulations</p>
               </div>
               <div className="text-center">
                 
-                <h3 className="font-bold mb-2">Get Recommendations</h3>
-                <p className="text-gray-600">Receive tailored optimization suggestions with potential savings calculations</p>
+                <h3 className="font-bold mb-2">Receive Recommendations</h3>
+                <p className="text-gray-600">Receive optimization suggestions with potential savings calculations</p>
               </div>
             </div>
           </div>
