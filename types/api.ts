@@ -21,4 +21,9 @@ export interface Recommendation {
   priority: number;
   potentialSavings: number;
   relatedFlows: RelatedFlow[];
+}
+
+export interface Completion {
+  id: string;
+  return: string;
 } 
