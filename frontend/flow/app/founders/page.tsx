@@ -1,5 +1,4 @@
 "use client"
-
 import Link from "next/link"
 import { ChevronDown } from "lucide-react"
 import Image from "next/image"
@@ -38,39 +37,57 @@ export default function FoundersPage() {
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Rick Petzold */}
+            {/* Johann Hipp */}
             <div className="flex flex-col items-center">
               <div className="w-48 h-48 rounded-full bg-gray-200 mb-4 overflow-hidden">
-                {/* Add actual image when available */}
-                <div className="w-full h-full bg-gray-300"></div>
+                <Image
+                  src="/founders/johann_pic.jpg"
+                  alt="Johann Hipp"
+                  width={500}
+                  height={500}
+                  priority
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h2 className="text-2xl font-bold mb-2 font-instrument-serif">Rick Petzold</h2>
+              <h2 className="text-2xl font-bold mb-2 font-instrument-serif">Johann Hipp</h2>
               <p className="text-center text-gray-600 font-instrument-sans">
-                Technical Lead & Co-founder
+              Technical Lead 
               </p>
             </div>
 
             {/* Johann Hipp */}
             <div className="flex flex-col items-center">
               <div className="w-48 h-48 rounded-full bg-gray-200 mb-4 overflow-hidden">
-                {/* Add actual image when available */}
-                <div className="w-full h-full bg-gray-300"></div>
+                <Image
+                  src="/founders/rick_pic.jpg"
+                  alt="Rick Petzold"
+                  width={500}
+                  height={500}
+                  priority
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h2 className="text-2xl font-bold mb-2 font-instrument-serif">Johann Hipp</h2>
+              <h2 className="text-2xl font-bold mb-2 font-instrument-serif">Rick Petzold</h2>
               <p className="text-center text-gray-600 font-instrument-sans">
-                Product Lead & Co-founder
+                Product Lead
               </p>
             </div>
 
             {/* Edgar Hipp */}
             <div className="flex flex-col items-center">
               <div className="w-48 h-48 rounded-full bg-gray-200 mb-4 overflow-hidden">
-                {/* Add actual image when available */}
-                <div className="w-full h-full bg-gray-300"></div>
+                <Image
+                  src="/founders/edgar_pic.jpg"
+                  alt="Edgar Hipp"
+                  width={500}
+                  height={500}
+                  priority
+                  className="w-full h-full object-cover"
+                />
               </div>
               <h2 className="text-2xl font-bold mb-2 font-instrument-serif">Edgar Hipp</h2>
               <p className="text-center text-gray-600 font-instrument-sans">
-                Business Lead & Co-founder
+                Business Lead
               </p>
             </div>
           </div>
