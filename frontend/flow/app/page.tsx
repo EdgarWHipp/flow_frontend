@@ -26,17 +26,17 @@ const LoadingScreen = ({ isVisible }) => {
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center duration-300 ${
         isVisible 
-          ? 'bg-white backdrop-blur-2xl' 
+          ? 'bg-white backdrop-blur-xl' 
           : 'bg-transparent backdrop-blur-none pointer-events-none'
       }`}
     >
       <div className={`flex flex-col items-center transition-opacity duration-300 ${
-        isVisible ? 'opacity-50' : 'opacity-25'
+        isVisible ? 'opacity-100' : 'opacity-25'
       }`}>
        
-        <Loader2 className="h-6 w-6 text-black-600 animate-spin" />
+        <Loader2 className="h-10 w-10 text-black-600 animate-spin" />
       </div>
     </div>
   );
