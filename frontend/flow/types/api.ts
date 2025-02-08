@@ -2,7 +2,15 @@ export interface Flow {
   id: string;
   name: string;
   description: string;
-  steps: string[];
+  return: string[];
+  requirements: string[];
+}
+
+export interface RelatedFlow {
+  id: string;
+  name: string;
+  description: string;
+  return: string[];
   requirements: string[];
 }
 
@@ -12,5 +20,5 @@ export interface Recommendation {
   description: string;
   priority: number;
   potentialSavings: number;
-  relatedFlows: Flow[];
+  relatedFlows: RelatedFlow[];
 } 
