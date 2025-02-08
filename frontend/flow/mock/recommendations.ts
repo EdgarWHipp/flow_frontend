@@ -12,7 +12,7 @@ export const MOCK_RECOMMENDATIONS: Recommendation[] = [
         id: "flow1",
         name: "Kirchensteuer Analyse",
         description: "Analysieren Sie Ihre Kirchensteuer-Situation",
-        return: ["Dokumentenprüfung", "Berechnung", "Empfehlung"],
+        return: "Durch die Analyse Ihrer Kirchensteuer-Situation können wir potenzielle Einsparungen identifizieren",
         requirements: ["Steuerbescheid", "Personaldokumente"]
       }
     ]
@@ -28,7 +28,7 @@ export const MOCK_RECOMMENDATIONS: Recommendation[] = [
         id: "flow2",
         name: "Steuerklassen Check",
         description: "Überprüfen Sie die optimale Steuerklasse",
-        return: ["Einkommensanalyse", "Vergleichsrechnung", "Empfehlung"],
+        return: "Die Optimierung Ihrer Steuerklasse kann zu einer verbesserten monatlichen Liquidität führen",
         requirements: ["Gehaltsnachweis", "Familienstand"]
       }
     ]
@@ -44,7 +44,7 @@ export const MOCK_RECOMMENDATIONS: Recommendation[] = [
         id: "flow3",
         name: "Wohnsitz Analyse",
         description: "Analysieren Sie Ihre Wohnsitzsituation",
-        return: ["Standortanalyse", "Kostenvergleich", "Empfehlung"],
+        return: "Eine strategische Wohnsitzwahl kann zu erheblichen steuerlichen Vorteilen führen",
         requirements: ["Mietvertrag", "Arbeitgeberbescheinigung"]
       }
     ]

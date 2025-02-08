@@ -10,7 +10,7 @@ export interface RelatedFlow {
   id: string;
   name: string;
   description: string;
-  return: string[];
+  return: string;
   requirements: string[];
 }
 

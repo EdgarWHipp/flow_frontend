@@ -6,6 +6,7 @@ import { Recommendation } from '../../../types/api'
 import { MOCK_RECOMMENDATIONS } from '../../../mock/recommendations'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { motion, AnimatePresence } from "framer-motion"
 
 // Add environment check
 const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
@@ -52,7 +53,7 @@ export default function FlowPage() {
   const StepContent = ({ step, requirements }: { step: string, requirements: string[] }) => (
     <div className="bg-white rounded-lg p-6 shadow-md h-full">
       <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-4">Action Required</h3>
+        <h3 className="text-xl font-semibold mb-4">Expected Return</h3>
         <p className="text-gray-600">{step}</p>
       </div>
 
@@ -132,52 +133,54 @@ export default function FlowPage() {
             <div className="w-1/3">
               <div className="sticky top-24 h-[calc(100vh-8rem)] flex items-center">
                 <div className="relative w-full">
-                  {flow.relatedFlows[0]?.return.map((step, index) => {
-                    const isSelected = selectedStep === index
-                    const isBeforeSelected = selectedStep !== null && index < selectedStep
-                    const isAfterSelected = selectedStep !== null && index > selectedStep
+                  <AnimatePresence>
+                    {flow.relatedFlows[0]?.return.map((step, index) => {
+                      const isSelected = selectedStep === index
+                      const isBeforeSelected = selectedStep !== null && index < selectedStep
+                      const isAfterSelected = selectedStep !== null && index > selectedStep
 
-                    return (
-                      <div
-                        key={index}
-                        className={`
-                          absolute w-full transition-all duration-500 ease-in-out
-                          ${isSelected ? 'relative z-10 scale-110' : 'z-0'}
-                          ${isBeforeSelected ? 
-                            'transform -translate-y-full scale-90 opacity-50' : 
-                            isAfterSelected ? 
-                            'transform translate-y-full scale-90 opacity-50' : 
-                            'relative'
-                          }
-                        `}
-                        style={{
-                          transform: isSelected ? 'translateY(0)' :
-                            isBeforeSelected ? `translateY(-${(selectedStep - index) * 130}%)` :
-                            isAfterSelected ? `translateY(${(index - selectedStep) * 110}%)` :
-                            'translateY(0)',
-                          marginBottom: isAfterSelected ? '0.75rem' : '1rem',
-                        }}
-                      >
-                        <button
-                          onClick={() => setSelectedStep(index)}
+                      return (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 50 }}
+                          animate={{
+                            opacity: isSelected ? 1 : isBeforeSelected || isAfterSelected ? 0.5 : 1,
+                            y: isSelected ? 0 : 
+                               isBeforeSelected ? -((selectedStep - index) * 130) :
+                               isAfterSelected ? ((index - selectedStep) * 110) : 0,
+                            scale: isSelected ? 1.1 : 0.9,
+                          }}
+                          exit={{ opacity: 0, y: 50 }}
+                          transition={{ duration: 0.3 }}
                           className={`
-                            w-full text-left p-4 rounded-lg transition-all
-                            ${isSelected ? 
-                              'bg-white border-2 border-blue-500 shadow-xl' : 
-                              'bg-white hover:bg-gray-50 border-2 border-transparent'
-                            }
+                            absolute w-full
+                            ${isSelected ? 'relative z-10' : 'z-0'}
                           `}
+                          style={{
+                            marginBottom: isAfterSelected ? '0.75rem' : '1rem',
+                          }}
                         >
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                              {index + 1}
+                          <button
+                            onClick={() => setSelectedStep(index)}
+                            className={`
+                              w-full text-left p-4 rounded-lg transition-all
+                              ${isSelected ? 
+                                'bg-white border-2 border-blue-500 shadow-xl' : 
+                                'bg-white hover:bg-gray-50 border-2 border-transparent'
+                              }
+                            `}
+                          >
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                                {index + 1}
+                              </div>
+                              <p className="ml-4 font-medium text-gray-800">{step}</p>
                             </div>
-                            <p className="ml-4 font-medium text-gray-800">{step}</p>
-                          </div>
-                        </button>
-                      </div>
-                    )
-                  })}
+                          </button>
+                        </motion.div>
+                      )
+                    })}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>
@@ -186,8 +189,8 @@ export default function FlowPage() {
             <div className="flex-1">
               {selectedStep !== null ? (
                 <StepContent 
-                  step={flow.relatedFlows[0]?.return[selectedStep]}
-                  requirements={[flow.relatedFlows[0]?.requirements[selectedStep]]}
+                  step={flow.relatedFlows[0]?.return}
+                  requirements={flow.relatedFlows[0]?.requirements}
                 />
               ) : (
                 <div className="bg-white rounded-lg p-6 shadow-md">
