@@ -5,58 +5,7 @@ import Link from "next/link"
 import { Upload, FileText, X, ChevronDown } from "lucide-react"
 import LoadingBar from "../components/LoadingBar"
 import { Recommendation } from '../types/api'
-
-// Add mock data constant
-const MOCK_RECOMMENDATIONS: Recommendation[] = [
-  {
-    id: "1",
-    title: "Kirchensteuer Optimierung",
-    description: "Durch Anpassung Ihrer Kirchenzugehörigkeit können Sie potenziell Steuern sparen.",
-    priority: 1,
-    potentialSavings: 1200,
-    relatedFlows: [
-      {
-        id: "flow1",
-        name: "Kirchensteuer Analyse",
-        description: "Analysieren Sie Ihre Kirchensteuer-Situation",
-        steps: ["Dokumentenprüfung", "Berechnung", "Empfehlung"],
-        requirements: ["Steuerbescheid", "Personaldokumente"]
-      }
-    ]
-  },
-  {
-    id: "2",
-    title: "Steuerklassen Optimierung",
-    description: "Eine Änderung der Steuerklasse könnte zu einer besseren monatlichen Liquidität führen.",
-    priority: 2,
-    potentialSavings: 2400,
-    relatedFlows: [
-      {
-        id: "flow2",
-        name: "Steuerklassen Check",
-        description: "Überprüfen Sie die optimale Steuerklasse",
-        steps: ["Einkommensanalyse", "Vergleichsrechnung", "Empfehlung"],
-        requirements: ["Gehaltsnachweis", "Familienstand"]
-      }
-    ]
-  },
-  {
-    id: "3",
-    title: "Wohnsitz Optimierung",
-    description: "Durch geschickte Wahl Ihres Hauptwohnsitzes können Sie Steuern optimieren.",
-    priority: 3,
-    potentialSavings: 3600,
-    relatedFlows: [
-      {
-        id: "flow3",
-        name: "Wohnsitz Analyse",
-        description: "Analysieren Sie Ihre Wohnsitzsituation",
-        steps: ["Standortanalyse", "Kostenvergleich", "Empfehlung"],
-        requirements: ["Mietvertrag", "Arbeitgeberbescheinigung"]
-      }
-    ]
-  }
-];
+import { MOCK_RECOMMENDATIONS } from '../mock/recommendations'
 
 // Add environment check (you can set this in your .env file)
 const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
@@ -324,9 +273,12 @@ export default function LandingPage() {
                     <div className="mt-2 text-sm text-green-600">
                       Potential savings: €{recommendation.potentialSavings}
                     </div>
-                    <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                    <Link 
+                      href={`/flow/${recommendation.id}`}
+                      className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
+                    >
                       View Flow
-                    </button>
+                    </Link>
                   </div>
                 ))}
               </div>
