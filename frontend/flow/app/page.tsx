@@ -9,6 +9,7 @@ import { MOCK_RECOMMENDATIONS } from '../mock/recommendations'
 
 // Add environment check (you can set this in your .env file)
 const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+const upload_endpoint = process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT || '/api/upload';
 
 // Add mock API function
 const getMockRecommendations = async (): Promise<Recommendation[]> => {
@@ -91,7 +92,8 @@ export default function LandingPage() {
       } else {
         // Upload document first
         const base64Content = await fileToBase64(fileToUpload);
-        const uploadResponse = await fetch('/api/documents', {
+        if (!upload_endpoint) throw new Error('Upload endpoint not configured');
+        const uploadResponse = await fetch(upload_endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
