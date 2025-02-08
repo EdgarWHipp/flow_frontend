@@ -59,7 +59,7 @@ export default function FoundersPage() {
             <div className="flex flex-col items-center">
               <div className="w-48 h-48 rounded-full bg-gray-200 mb-4 overflow-hidden">
                 <Image
-                  src="/founders/rick_pic.jpg"
+                  src="/founders/rick_pic.jpeg"
                   alt="Rick Petzold"
                   width={500}
                   height={500}
