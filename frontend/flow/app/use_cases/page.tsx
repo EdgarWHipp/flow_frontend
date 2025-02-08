@@ -35,104 +35,31 @@ export default function UseCasesPage() {
             Transform Your <span className="italic">Financial</span> Decision Making
           </h1>
 
-          {/* Introduction Section */}
-          <div className="mb-16">
-            <p className="text-xl text-center mb-8 font-instrument-sans">
-              Our AI-powered system analyzes your financial documents and provides tailored recommendations 
-              for optimization within the German regulatory framework.
-            </p>
-          </div>
-
-          {/* Use Cases Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Tax Optimization */}
-            <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow">
-              <h2 className="text-2xl font-bold mb-4 font-instrument-serif">Tax Optimization</h2>
-              <p className="text-gray-600 mb-4">
-                Automatically identify tax-saving opportunities specific to German tax law:
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Einkommensteuer optimization strategies</li>
-                <li>• Applicable tax deductions for your business</li>
-                <li>• VAT (Umsatzsteuer) compliance and optimization</li>
-                <li>• Investment-related tax benefits</li>
-              </ul>
-            </div>
-
-            {/* Investment Planning */}
-            <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow">
-              <h2 className="text-2xl font-bold mb-4 font-instrument-serif">Investment Planning</h2>
-              <p className="text-gray-600 mb-4">
-                Receive personalized investment recommendations based on:
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li>• German market-specific opportunities</li>
-                <li>• Risk profile analysis</li>
-                <li>• Portfolio diversification strategies</li>
-                <li>• Retirement planning optimization</li>
-              </ul>
-            </div>
-
-            {/* Business Operations */}
-            <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow">
-              <h2 className="text-2xl font-bold mb-4 font-instrument-serif">Business Operations</h2>
-              <p className="text-gray-600 mb-4">
-                Optimize your business finances with insights on:
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Cash flow optimization</li>
-                <li>• Working capital management</li>
-                <li>• Cost reduction opportunities</li>
-                <li>• Supplier payment optimization</li>
-              </ul>
-            </div>
-
-            {/* Compliance & Reporting */}
-            <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow">
-              <h2 className="text-2xl font-bold mb-4 font-instrument-serif">Compliance & Reporting</h2>
-              <p className="text-gray-600 mb-4">
-                Stay compliant with German regulations through:
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Financial reporting requirements</li>
-                <li>• Regulatory compliance checks</li>
-                <li>• Documentation optimization</li>
-                <li>• Audit preparation assistance</li>
-              </ul>
-            </div>
-          </div>
+          
 
           {/* How It Works Section */}
           <div className="mt-16 bg-white rounded-lg p-8 shadow-sm">
-            <h2 className="text-3xl font-bold mb-6 font-instrument-serif text-center">How It Works</h2>
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="text-2xl font-bold mb-2 text-blue-600">1</div>
+                
                 <h3 className="font-bold mb-2">Upload Documents</h3>
                 <p className="text-gray-600">Simply upload your financial documents - from tax returns to business reports</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold mb-2 text-blue-600">2</div>
+               
                 <h3 className="font-bold mb-2">AI Analysis</h3>
                 <p className="text-gray-600">Our expert system analyzes your documents using German financial regulations</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold mb-2 text-blue-600">3</div>
+                
                 <h3 className="font-bold mb-2">Get Recommendations</h3>
                 <p className="text-gray-600">Receive tailored optimization suggestions with potential savings calculations</p>
               </div>
             </div>
           </div>
 
-          {/* CTA Section */}
-          <div className="mt-16 text-center">
-            <Link
-              href="/"
-              className="inline-block bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-colors font-instrument-sans"
-            >
-              Start Optimizing Your Finances
-            </Link>
-          </div>
+        
         </div>
       </div>
 
