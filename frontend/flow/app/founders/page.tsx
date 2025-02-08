@@ -53,6 +53,10 @@ export default function FoundersPage() {
               <p className="text-center text-gray-600 font-instrument-sans">
               Technical Lead 
               </p>
+              <p className="text-center text-gray-600 font-instrument-sans">
+              <i>Currently @Deloitte 
+              </i>
+              </p>
             </div>
 
             {/* Johann Hipp */}
@@ -71,6 +75,9 @@ export default function FoundersPage() {
               <p className="text-center text-gray-600 font-instrument-sans">
                 Product Lead
               </p>
+              <p className="text-center text-gray-600 font-instrument-sans">
+              <i>Currently @Deloitte 
+              </i>              </p>
             </div>
 
             {/* Edgar Hipp */}
@@ -88,6 +95,10 @@ export default function FoundersPage() {
               <h2 className="text-2xl font-bold mb-2 font-instrument-serif">Edgar Hipp</h2>
               <p className="text-center text-gray-600 font-instrument-sans">
                 Business Lead
+              </p>
+              <p className="text-center text-gray-600 font-instrument-sans">
+                <i>Currently @PwC
+                  </i>
               </p>
             </div>
           </div>
