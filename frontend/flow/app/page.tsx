@@ -2,23 +2,52 @@
 
 import { useState, useEffect, useRef, DragEvent, ChangeEvent } from "react"
 import Link from "next/link"
-import { Upload, FileText, X, ChevronDown } from "lucide-react"
-import LoadingBar from "../components/LoadingBar"
+import { Upload, FileText, X, ChevronDown, Loader2 } from "lucide-react"
 import { Recommendation } from '../types/api'
 import { MOCK_RECOMMENDATIONS } from '../mock/recommendations'
 
-// Add environment check (you can set this in your .env file)
 const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 const upload_endpoint = process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT || '/api/upload';
 
-// Add mock API function
+const LoadingScreen = ({ isVisible }) => {
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (isVisible) {
+      setShouldRender(true);
+    } else {
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+      }, 300); // Match this with the CSS transition duration
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
+
+  if (!shouldRender) return null;
+
+  return (
+    <div 
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
+        isVisible 
+          ? 'bg-white backdrop-blur-2xl' 
+          : 'bg-transparent backdrop-blur-none pointer-events-none'
+      }`}
+    >
+      <div className={`flex flex-col items-center transition-opacity duration-300 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}>
+       
+        <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+      </div>
+    </div>
+  );
+};
+
 const getMockRecommendations = async (): Promise<Recommendation[]> => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   return MOCK_RECOMMENDATIONS;
 };
 
-// Utility function to convert File to base64
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -86,11 +115,9 @@ export default function LandingPage() {
     setIsLoading(true);
     try {
       if (IS_MOCK) {
-        // Use mock data with artificial delay
         const mockData = await getMockRecommendations();
         setRecommendations(mockData);
       } else {
-        // Upload document first
         const base64Content = await fileToBase64(fileToUpload);
         if (!upload_endpoint) throw new Error('Upload endpoint not configured');
         const uploadResponse = await fetch(upload_endpoint, {
@@ -113,7 +140,6 @@ export default function LandingPage() {
 
         const { documentId } = await uploadResponse.json();
 
-        // Then get recommendations
         const recommendationsResponse = await fetch(`/api/recommendations?documentId=${documentId}`);
         if (!recommendationsResponse.ok) {
           throw new Error('Failed to fetch recommendations');
@@ -124,7 +150,6 @@ export default function LandingPage() {
       }
     } catch (error) {
       console.error('Error processing file:', error);
-      // Fallback to mock data if API fails
       const mockData = await getMockRecommendations();
       setRecommendations(mockData);
     } finally {
@@ -134,41 +159,25 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-[#f3f1ea]">
+      <LoadingScreen isVisible={isLoading} />
+      
       {/* Header */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 
-        bg-[#F2F1EA]/80 backdrop-blur-lg border-b-2 border-[#E8E8E8]
-        h-[66px] flex items-center"
-      >
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#F2F1EA]/80 backdrop-blur-lg border-b-2 border-[#E8E8E8] h-[66px] flex items-center">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          {/* Logo container */}
           <div className="lg:absolute lg:left-[271px]">
             <div className="relative">
               <span className="font-instrument-serif text-xl font-bold">flow</span>
             </div>
           </div>
 
-          {/* Right side elements */}
           <div className="lg:absolute lg:right-[271px] flex items-center gap-[40px]">
-           
-              <Link
-                href="/use_cases"
-                className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans flex items-center"
-              >
-                Use Cases
-                </Link>
-              
-    
-            <Link
-              href="/founders"
-              className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans"
-            >
+            <Link href="/use_cases" className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans flex items-center">
+              Use Cases
+            </Link>
+            <Link href="/founders" className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans">
               Meet the Founders
             </Link>
-            <Link
-              href="/contact"
-              className="text-[13px] font-medium bg-black text-white px-[13px] pt-[8px] pb-[8px] rounded-[7px] hover:bg-gray-800 transition-colors font-instrument-sans"
-            >
+            <Link href="/contact" className="text-[13px] font-medium bg-black text-white px-[13px] pt-[8px] pb-[8px] rounded-[7px] hover:bg-gray-800 transition-colors font-instrument-sans">
               Contact Us
             </Link>
           </div>
@@ -226,29 +235,15 @@ export default function LandingPage() {
                 </label>
               </>
             ) : (
-              <>
-                <div className="flex items-center justify-between bg-white p-4 rounded-md">
-                  <div className="flex items-center">
-                    <FileText className="h-8 w-8 text-blue-500 mr-3" />
-                    <span className="font-medium">{file.name}</span>
-                  </div>
-                  <button onClick={removeFile} className="text-red-500 hover:text-red-700">
-                    <X className="h-5 w-5" />
-                  </button>
+              <div className="flex items-center justify-between bg-white p-4 rounded-md">
+                <div className="flex items-center">
+                  <FileText className="h-8 w-8 text-blue-500 mr-3" />
+                  <span className="font-medium">{file.name}</span>
                 </div>
-                {isLoading && (
-                  <div className="mt-4">
-                    <div className="w-full h-[40px] overflow-hidden">
-                      <LoadingBar />
-                    </div>
-
-                    <p className="mt-2 text-lg font-semibold text-black-600 animate-bounce">
-                      creating flows
-                      <span className="inline-block animate-wave"></span>
-                    </p>
-                  </div>
-                )}
-              </>
+                <button onClick={removeFile} className="text-red-500 hover:text-red-700">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             )}
           </div>
 
@@ -265,28 +260,21 @@ export default function LandingPage() {
                       Potential savings: €{recommendation.potentialSavings}
                     </div>
                     <Link 
-  href={`/flow/${recommendation.id}`}
-  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
-  onClick={(e) => {
-    e.preventDefault()
-    // Add a slight delay before navigation to allow the exit animation to play
-    document.body.style.overflow = 'hidden'
-    setTimeout(() => {
-      window.location.href = `/flow/${recommendation.id}`
-    }, 300)
-  }}
->
-  View Flow
-</Link>
+                      href={`/flow/${recommendation.id}`}
+                      className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        document.body.style.overflow = 'hidden'
+                        setTimeout(() => {
+                          window.location.href = `/flow/${recommendation.id}`
+                        }, 300)
+                      }}
+                    >
+                      View Flow
+                    </Link>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {file && !isLoading && (
-            <div className="mt-6 text-center">
-              
             </div>
           )}
         </div>
@@ -296,17 +284,10 @@ export default function LandingPage() {
       <footer className="bg-black text-white py-8 w-full">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-4">
-            
             <nav className="flex gap-6">
-              <Link href="/about" className="hover:underline">
-                About
-              </Link>
-              <Link href="/privacy" className="hover:underline">
-                Privacy
-              </Link>
-              <Link href="/terms" className="hover:underline">
-                Terms
-              </Link>
+              <Link href="/about" className="hover:underline">About</Link>
+              <Link href="/privacy" className="hover:underline">Privacy</Link>
+              <Link href="/terms" className="hover:underline">Terms</Link>
             </nav>
             <p className="text-sm opacity-70">
               Made with <span className="text-red-500">❤️</span> and the power of AI.
