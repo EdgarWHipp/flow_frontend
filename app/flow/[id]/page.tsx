@@ -2,186 +2,96 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { Recommendation } from '../../../types/api'
-import { MOCK_RECOMMENDATIONS } from '../../../mock/recommendations'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { motion, AnimatePresence } from "framer-motion"
+import ChatInterface from '@/components/ChatInterface'
 
-// Add environment check
-const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
-
-interface CachedDocument {
-  file: File;
-  documentId: string;
-  timestamp: number;
+interface FlowResponse {
+  id: string;
+  title: string;
+  description: string;
+  potentialSavings: number;
+  relatedFlows: Array<{
+    return: string;
+    requirements: string[];
+  }>;
 }
 
 export default function FlowPage() {
   const params = useParams()
-  const [flow, setFlow] = useState<Recommendation | null>(null)
+  const [flow, setFlow] = useState<FlowResponse | null>(null)
   const [loading, setLoading] = useState(true)
-  const [selectedStep, setSelectedStep] = useState<number | null>(null)
-  const [documentCache, setDocumentCache] = useState<CachedDocument | null>(null)
+  const [isPdf, setIsPdf] = useState(false)
 
   useEffect(() => {
     const fetchFlow = async () => {
       try {
-        if (IS_MOCK) {
-          // Use mock data
-          const mockFlow = MOCK_RECOMMENDATIONS.find(r => r.id === params.id)
-          setFlow(mockFlow || null)
-        } else {
-          // Real API implementation
-          const response = await fetch(`/api/flows/${params.id}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch flow');
+        // Initial recommendation fetch
+        const response = await fetch(`/api/flows/${params.id}`);
+        if (!response.ok) throw new Error('Failed to fetch flow');
+        const data = await response.json();
+        setFlow(data);
+
+        // Check if return value is a PDF path
+        const returnValue = data.relatedFlows[0]?.return || '';
+        setIsPdf(returnValue.startsWith('/') && returnValue.endsWith('.pdf'));
+
+        // If not a PDF, fetch completion
+        if (!isPdf) {
+          const completionResponse = await fetch('/api/completion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ flowId: params.id }),
+          });
+          if (completionResponse.ok) {
+            const completionData = await completionResponse.json();
+            setFlow(prev => ({
+              ...prev!,
+              relatedFlows: [{ ...prev!.relatedFlows[0], return: completionData.message }]
+            }));
           }
-          const data = await response.json();
-          setFlow(data);
         }
       } catch (error) {
-        console.error('Error fetching flow:', error)
-        // Fallback to mock data
-        const mockFlow = MOCK_RECOMMENDATIONS.find(r => r.id === params.id)
-        setFlow(mockFlow || null)
+        console.error('Error:', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchFlow()
-  }, [params.id])
+    fetchFlow();
+  }, [params.id]);
 
-  // Load cached document on component mount
-  useEffect(() => {
-    const cachedData = localStorage.getItem('documentCache')
-    if (cachedData) {
-      const parsed = JSON.parse(cachedData)
-      // Check if cache is less than 24 hours old
-      if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
-        setDocumentCache(parsed)
-      } else {
-        // Clear expired cache
-        localStorage.removeItem('documentCache')
-      }
-    }
-  }, [])
-
-  const handleStepClick = (index: number) => {
-    setSelectedStep(selectedStep === index ? null : index)
-  }
-
-  const handleFileUpload = async (fileToUpload: File) => {
-    setIsLoading(true);
+  const handleSendMessage = async (message: string) => {
     try {
-      if (IS_MOCK) {
-        const mockData = await getMockRecommendations();
-        setRecommendations(mockData);
-      } else {
-        const base64Content = await fileToBase64(fileToUpload);
-        const uploadResponse = await fetch('/api/documents', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: fileToUpload.type,
-            content: base64Content,
-            metadata: {
-              filename: fileToUpload.name,
-              uploadedAt: new Date().toISOString(),
-              mimeType: fileToUpload.type,
-            },
-          }),
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Document upload failed');
-        }
-
-        const { documentId } = await uploadResponse.json();
-
-        // Cache the document data
-        const cacheData: CachedDocument = {
-          file: fileToUpload,
-          documentId,
-          timestamp: Date.now()
-        }
-        localStorage.setItem('documentCache', JSON.stringify(cacheData))
-        setDocumentCache(cacheData)
-
-        const recommendationsResponse = await fetch(`/api/recommendations?documentId=${documentId}`);
-        if (!recommendationsResponse.ok) {
-          throw new Error('Failed to fetch recommendations');
-        }
-
-        const recommendationsData = await recommendationsResponse.json();
-        setRecommendations(recommendationsData);
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          flowId: params.id,
+          message 
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Update flow with new message
+        setFlow(prev => ({
+          ...prev!,
+          relatedFlows: [{ ...prev!.relatedFlows[0], return: data.message }]
+        }));
       }
     } catch (error) {
-      console.error('Error processing file:', error);
-      const mockData = await getMockRecommendations();
-      setRecommendations(mockData);
-    } finally {
-      setIsLoading(false);
+      console.error('Error sending message:', error);
     }
   };
-
-  // Add a function to clear the cache
-  const clearDocumentCache = () => {
-    localStorage.removeItem('documentCache')
-    setDocumentCache(null)
-  }
-
-  const StepContent = ({ step, requirements }: { step: string, requirements: string[] }) => (
-    <div className="bg-white rounded-lg p-6 shadow-md h-full">
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-4">Expected Return</h3>
-        <p className="text-gray-600">{step}</p>
-      </div>
-
-      <div className="mb-6">
-        <h4 className="font-semibold mb-2">Documents needed:</h4>
-        <ul className="list-disc pl-5 space-y-2">
-          {requirements.map((req, idx) => (
-            <li key={idx} className="text-gray-700">{req}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Upload Document
-          </label>
-          <input
-            type="file"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Additional Notes
-          </label>
-          <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            rows={4}
-          />
-        </div>
-
-        <button className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors">
-          Submit
-        </button>
-      </div>
-    </div>
-  )
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f3f1ea] flex items-center justify-center">
         <div className="text-xl font-semibold">Loading...</div>
       </div>
-    )
+    );
   }
 
   if (!flow) {
@@ -189,12 +99,12 @@ export default function FlowPage() {
       <div className="min-h-screen bg-[#f3f1ea] flex items-center justify-center">
         <div className="text-xl font-semibold">Flow not found</div>
       </div>
-    )
+    );
   }
 
   return (
     <main className="min-h-screen bg-[#f3f1ea]">
-      {/* Fixed header bar */}
+      {/* Header */}
       <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
         <div className="max-w-7xl mx-auto px-8 h-16 flex items-center">
           <Link 
@@ -207,98 +117,35 @@ export default function FlowPage() {
         </div>
       </div>
 
-      {/* Main content with top padding to account for fixed header */}
-      <div className="pt-16">
-        <div className="max-w-7xl mx-auto p-8">
-          <div className="flex gap-8">
-            {/* Left sidebar with steps - updated for single step */}
-            <div className="w-1/3">
-              <div className="sticky top-24 h-[calc(100vh-8rem)] flex items-center">
-                <div className="relative w-full">
-                  <AnimatePresence>
-                    {flow.relatedFlows[0]?.message && (
-                      <motion.div
-                        key="single-step"
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{
-                          opacity: selectedStep === 0 ? 1 : 0.5,
-                          y: 0,
-                          scale: selectedStep === 0 ? 1.1 : 0.9,
-                        }}
-                        exit={{ opacity: 0, y: 50 }}
-                        transition={{ duration: 0.3 }}
-                        className={`
-                          absolute w-full
-                          ${selectedStep === 0 ? 'relative z-10' : 'z-0'}
-                        `}
-                      >
-                        <button
-                          onClick={() => setSelectedStep(0)}
-                          className={`
-                            w-full text-left p-4 rounded-lg transition-all
-                            ${selectedStep === 0 ? 
-                              'bg-white border-2 border-blue-500 shadow-xl' : 
-                              'bg-white hover:bg-gray-50 border-2 border-transparent'
-                            }
-                          `}
-                        >
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                              1
-                            </div>
-                            <p className="ml-4 font-medium text-gray-800">
-                              {flow.relatedFlows[0].message}
-                            </p>
-                          </div>
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </div>
-
-            {/* Right side content */}
-            <div className="flex-1">
-              {selectedStep !== null ? (
-                <StepContent 
-                  step={flow.relatedFlows[0]?.message || ''}
-                  requirements={flow.relatedFlows[0]?.requirements || []}
-                />
-              ) : (
-                <div className="bg-white rounded-lg p-6 shadow-md">
-                  <h1 className="text-3xl font-bold mb-4">{flow.title}</h1>
-                  <p className="text-gray-600 mb-6">{flow.description}</p>
-                  
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Potential Savings</h2>
-                    <p className="text-green-600 text-2xl font-bold">€{flow.potentialSavings}</p>
-                  </div>
-
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-blue-800">
-                      Select a step from the left to get started
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+      {/* Main content */}
+      <div className="pt-24 px-8 max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-4">{flow.title}</h1>
+          <p className="text-gray-600 mb-6">{flow.description}</p>
+          <div className="text-green-600 text-xl font-semibold">
+            Potential savings: €{flow.potentialSavings}
           </div>
         </div>
-      </div>
 
-      {/* Add this somewhere in your UI if you want to show cached document info */}
-      {documentCache && (
-        <div className="text-sm text-gray-600 mt-2">
-          Using cached document: {documentCache.file.name}
-          <button 
-            onClick={clearDocumentCache}
-            className="ml-2 text-red-500 hover:text-red-700"
+        {isPdf ? (
+          // PDF download button
+          <a
+            href={flow.relatedFlows[0].return}
+            download
+            className="inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            Clear Cache
-          </button>
-        </div>
-      )}
+            Download PDF
+          </a>
+        ) : (
+          // Chat interface
+          <div className="h-[600px]">
+            <ChatInterface
+              initialMessage={flow.relatedFlows[0].return}
+              onSendMessage={handleSendMessage}
+            />
+          </div>
+        )}
+      </div>
     </main>
-  )
+  );
 } 
