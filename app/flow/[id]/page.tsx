@@ -129,57 +129,48 @@ export default function FlowPage() {
       <div className="pt-16">
         <div className="max-w-7xl mx-auto p-8">
           <div className="flex gap-8">
-            {/* Left sidebar with steps - updated for centered selection */}
+            {/* Left sidebar with steps - updated for single step */}
             <div className="w-1/3">
               <div className="sticky top-24 h-[calc(100vh-8rem)] flex items-center">
                 <div className="relative w-full">
                   <AnimatePresence>
-                    {flow.relatedFlows[0]?.return.map((step, index) => {
-                      const isSelected = selectedStep === index
-                      const isBeforeSelected = selectedStep !== null && index < selectedStep
-                      const isAfterSelected = selectedStep !== null && index > selectedStep
-
-                      return (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: 50 }}
-                          animate={{
-                            opacity: isSelected ? 1 : isBeforeSelected || isAfterSelected ? 0.5 : 1,
-                            y: isSelected ? 0 : 
-                               isBeforeSelected ? -((selectedStep - index) * 130) :
-                               isAfterSelected ? ((index - selectedStep) * 110) : 0,
-                            scale: isSelected ? 1.1 : 0.9,
-                          }}
-                          exit={{ opacity: 0, y: 50 }}
-                          transition={{ duration: 0.3 }}
+                    {flow.relatedFlows[0]?.return && (
+                      <motion.div
+                        key="single-step"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{
+                          opacity: selectedStep === 0 ? 1 : 0.5,
+                          y: 0,
+                          scale: selectedStep === 0 ? 1.1 : 0.9,
+                        }}
+                        exit={{ opacity: 0, y: 50 }}
+                        transition={{ duration: 0.3 }}
+                        className={`
+                          absolute w-full
+                          ${selectedStep === 0 ? 'relative z-10' : 'z-0'}
+                        `}
+                      >
+                        <button
+                          onClick={() => setSelectedStep(0)}
                           className={`
-                            absolute w-full
-                            ${isSelected ? 'relative z-10' : 'z-0'}
+                            w-full text-left p-4 rounded-lg transition-all
+                            ${selectedStep === 0 ? 
+                              'bg-white border-2 border-blue-500 shadow-xl' : 
+                              'bg-white hover:bg-gray-50 border-2 border-transparent'
+                            }
                           `}
-                          style={{
-                            marginBottom: isAfterSelected ? '0.75rem' : '1rem',
-                          }}
                         >
-                          <button
-                            onClick={() => setSelectedStep(index)}
-                            className={`
-                              w-full text-left p-4 rounded-lg transition-all
-                              ${isSelected ? 
-                                'bg-white border-2 border-blue-500 shadow-xl' : 
-                                'bg-white hover:bg-gray-50 border-2 border-transparent'
-                              }
-                            `}
-                          >
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                                {index + 1}
-                              </div>
-                              <p className="ml-4 font-medium text-gray-800">{step}</p>
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                              1
                             </div>
-                          </button>
-                        </motion.div>
-                      )
-                    })}
+                            <p className="ml-4 font-medium text-gray-800">
+                              {flow.relatedFlows[0].return}
+                            </p>
+                          </div>
+                        </button>
+                      </motion.div>
+                    )}
                   </AnimatePresence>
                 </div>
               </div>
