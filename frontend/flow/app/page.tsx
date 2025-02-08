@@ -148,26 +148,15 @@ export default function LandingPage() {
 
           {/* Right side elements */}
           <div className="lg:absolute lg:right-[271px] flex items-center gap-[40px]">
-            <div className="relative" ref={useCasesRef}>
-              <button
-                onClick={() => setIsUseCasesOpen(!isUseCasesOpen)}
+           
+              <Link
+                href="/use_cases"
                 className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans flex items-center"
               >
                 Use Cases
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </button>
-              {isUseCasesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg">
-                  <div className="p-4">
-                    <h3 className="text-sm font-semibold mb-2">Financial Analysis Automation</h3>
-                    <p className="text-xs text-gray-600">
-                      Flow automates intelligent financial analysis, providing expert-level insights from your financial
-                      data.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+                </Link>
+              
+    
             <Link
               href="/founders"
               className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans"
