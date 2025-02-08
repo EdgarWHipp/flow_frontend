@@ -1,21 +1,21 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, DragEvent, ChangeEvent } from "react"
 import Link from "next/link"
 import { Upload, FileText, X, ChevronDown } from "lucide-react"
 import LoadingBar from "../components/LoadingBar"
 
 export default function LandingPage() {
-  const [file, setFile] = useState(null)
+  const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isUseCasesOpen, setIsUseCasesOpen] = useState(false)
   const [userDescription, setUserDescription] = useState("")
-  const useCasesRef = useRef(null)
+  const useCasesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (useCasesRef.current && !useCasesRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (useCasesRef.current && !useCasesRef.current.contains(event.target as Node)) {
         setIsUseCasesOpen(false)
       }
     }
@@ -26,7 +26,7 @@ export default function LandingPage() {
     }
   }, [])
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(true)
   }
@@ -35,7 +35,7 @@ export default function LandingPage() {
     setIsDragging(false)
   }
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
     const droppedFile = e.dataTransfer.files[0]
@@ -47,8 +47,8 @@ export default function LandingPage() {
     }, 5000) // 5 seconds delay for demonstration
   }
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null
     setFile(selectedFile)
     setIsLoading(true)
     // Simulating file analysis delay
