@@ -274,11 +274,19 @@ export default function LandingPage() {
                       Potential savings: €{recommendation.potentialSavings}
                     </div>
                     <Link 
-                      href={`/flow/${recommendation.id}`}
-                      className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
-                    >
-                      View Flow
-                    </Link>
+  href={`/flow/${recommendation.id}`}
+  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors inline-block"
+  onClick={(e) => {
+    e.preventDefault()
+    // Add a slight delay before navigation to allow the exit animation to play
+    document.body.style.overflow = 'hidden'
+    setTimeout(() => {
+      window.location.href = `/flow/${recommendation.id}`
+    }, 300)
+  }}
+>
+  View Flow
+</Link>
                   </div>
                 ))}
               </div>
@@ -318,4 +326,3 @@ export default function LandingPage() {
     </main>
   )
 }
-
