@@ -30,18 +30,50 @@ export default function UseCasesPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center bg-[#f3f1ea] pt-[66px]">
-        <div className="w-full max-w-4xl mx-auto px-4 py-16">
-          <h1 className="text-5xl font-bold text-center mb-12 font-instrument-serif">
-            Transform Your <span className="italic">Financial</span> Decision Making
-          </h1>
+        <div className="w-full max-w-2xl mx-auto px-8 py-16">
+          {/* Fixed Title Section */}
+          <div className="mb-20">
+            <h1 className="text-5xl font-bold text-center mb-8 font-instrument-serif tracking-tight">
+              Transform Your <span className="italic">Financial</span> Decision Making
+            </h1>
+          </div>
 
-          <p className="text-xl text-center mb-12 font-instrument-sans">
-            goldfish analyzes your financial data & provides insights you'd normally need an expert to uncover.
-          </p>
-
-        
-
-        
+          {/* Content Sections */}
+          
+          <div className="text-left">
+              <h2 className="text-3xl font-bold mb-6 font-instrument-serif tracking-tight">Introduction</h2>
+              <p className="text-lg text-gray-700 font-instrument-sans leading-relaxed">
+                Goldfish is a project launched at a Berlin AI Hackathon that focuses on giving individuals more financial freedom.
+                 One can upload their personal financial statement and recieve personal recommendations on how to minimize their spendings.
+                
+      
+              </p>
+            </div>
+            <br></br><br></br>
+            
+            <div className="text-left">
+              <h2 className="text-3xl font-bold mb-6 font-instrument-serif tracking-tight">Background</h2>
+              <p className="text-lg text-gray-700 font-instrument-sans leading-relaxed">
+                The aim was to create a general application that can guide an individual to a more secure personal financial situation. 
+                While other tools like Finanzfluss, Kirchensteuer.de etc already exist, a solution that guides a person through several optimizations for their finances does not yet exist. Goldfish aims to tackle this. 
+                In the current version goldfish aims to identify issues such as:
+                <ul className="list-disc list-inside text-left max-w-md mx-auto mt-4 text-gray-700 font-instrument-sans">
+                <li>Tax benefits of a church exit</li>
+                <li>Tex benefits when switching your tax class </li>
+                <li>Overpaying for your rent</li>
+                <li>Overspending on leisure </li>
+                <li>Too many unused monthly subscriptions</li>
+              </ul>
+              </p>
+            </div>
+            <br></br><br></br>
+            <div className="text-left">
+              <h2 className="text-3xl font-bold mb-6 font-instrument-serif tracking-tight">How it works</h2>
+              <p className="text-lg text-gray-700 font-instrument-sans leading-relaxed">
+                
+              
+              </p>
+            </div>
         </div>
       </div>
 
@@ -54,7 +86,6 @@ export default function UseCasesPage() {
               <Link href="/privacy" className="hover:underline">Privacy</Link>
               <Link href="/terms" className="hover:underline">Terms</Link>
             </nav>
-
           </div>
         </div>
       </footer>
