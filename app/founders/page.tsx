@@ -11,7 +11,7 @@ export default function FoundersPage() {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="lg:absolute lg:left-[271px]">
             <Link href="/">
-              <span className="font-instrument-serif text-xl font-bold">flow</span>
+            <span className="font-instrument-serif text-xl font-bold text-orange-500"><i>goldfish</i></span>
             </Link>
           </div>
           
@@ -32,9 +32,7 @@ export default function FoundersPage() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center bg-[#f3f1ea] pt-[66px]">
         <div className="w-full max-w-4xl mx-auto px-4 py-16">
-          <h1 className="text-5xl font-bold text-center mb-12 font-instrument-serif">
-            Meet the <span className="italic">Founders</span>
-          </h1>
+         
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Johann Hipp */}

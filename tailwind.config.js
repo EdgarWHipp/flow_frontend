@@ -10,16 +10,14 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        wave: "wave 2.5s ease-in-out infinite",
+        wave: "wave 3s ease-in-out infinite",
         'fade-in': 'fadeIn 0.5s ease-out forwards',
       },
       keyframes: {
         wave: {
-          "0%, 100%": { transform: "rotate(0deg)" },
-          "20%": { transform: "rotate(20deg)" },
-          "40%": { transform: "rotate(-10deg)" },
-          "60%": { transform: "rotate(10deg)" },
-          "80%": { transform: "rotate(-20deg)" },
+          "0%": { transform: "scale(0)", opacity: "0.5" },
+          "50%": { transform: "scale(1.5)", opacity: "0" },
+          "100%": { transform: "scale(0)", opacity: "0" },
         },
         fadeIn: {
           '0%': { opacity: '0' },

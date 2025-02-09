@@ -76,3 +76,22 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes wave {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-wave {
+  animation: wave 3s ease-in-out infinite;
+}

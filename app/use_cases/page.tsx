@@ -10,7 +10,7 @@ export default function UseCasesPage() {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="lg:absolute lg:left-[271px]">
             <Link href="/">
-              <span className="font-instrument-serif text-xl font-bold">flow</span>
+            <span className="font-instrument-serif text-xl font-bold text-orange-500"><i>goldfish</i></span>
             </Link>
           </div>
           
@@ -35,29 +35,11 @@ export default function UseCasesPage() {
             Transform Your <span className="italic">Financial</span> Decision Making
           </h1>
 
-          
+          <p className="text-xl text-center mb-12 font-instrument-sans">
+            goldfish analyzes your financial data & provides insights you'd normally need an expert to uncover.
+          </p>
 
-          {/* How It Works Section */}
-          <div className="mt-16 bg-white rounded-lg p-8 shadow-sm">
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                
-                <h3 className="font-bold mb-2">Upload Documents</h3>
-                <p className="text-gray-600">Upload your financial documents - from tax returns to business reports</p>
-              </div>
-              <div className="text-center">
-               
-                <h3 className="font-bold mb-2">Analysis</h3>
-                <p className="text-gray-600">Our system analyzes your documents using German financial regulations</p>
-              </div>
-              <div className="text-center">
-                
-                <h3 className="font-bold mb-2">Receive Recommendations</h3>
-                <p className="text-gray-600">Receive optimization suggestions with potential savings calculations</p>
-              </div>
-            </div>
-          </div>
+        
 
         
         </div>
@@ -67,15 +49,12 @@ export default function UseCasesPage() {
       <footer className="bg-black text-white py-8 w-full">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-4">
-            <span className="font-instrument-serif text-xl font-bold">flow</span>
             <nav className="flex gap-6">
               <Link href="/about" className="hover:underline">About</Link>
               <Link href="/privacy" className="hover:underline">Privacy</Link>
               <Link href="/terms" className="hover:underline">Terms</Link>
             </nav>
-            <p className="text-sm opacity-70">
-              Made with <span className="text-red-500">❤️</span> and the power of AI.
-            </p>
+
           </div>
         </div>
       </footer>
