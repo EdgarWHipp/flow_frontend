@@ -206,13 +206,13 @@ export default function LandingPage() {
 
           <div className="lg:absolute lg:right-[271px] flex items-center gap-[40px]">
             <Link href="/use_cases" className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans flex items-center">
-              Use Cases
+              Blog
             </Link>
             <Link href="/founders" className="text-[13px] font-medium text-gray-700 hover:text-gray-900 transition-colors font-instrument-sans">
-              Meet the Founders
+              Team
             </Link>
             <Link href="/contact" className="text-[13px] font-medium bg-black text-white px-[13px] pt-[8px] pb-[8px] rounded-[7px] hover:bg-gray-800 transition-colors font-instrument-sans">
-              Contact Us
+              Contact
             </Link>
           </div>
         </div>
@@ -287,7 +287,7 @@ export default function LandingPage() {
             >
               <div className="container mx-auto px-4">
                 <h2 className="text-2xl font-bold mb-6 text-center">
-                  {recommendations.length} goldfish found in your pond
+                  {recommendations.length} <span className="font-instrument-serif font-bold text-orange-500"><i>goldfish</i></span> found in your pond
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative">
                   {/* Ripple Effect Container */}
@@ -332,9 +332,6 @@ export default function LandingPage() {
               <Link href="/privacy" className="hover:underline">Privacy</Link>
               <Link href="/terms" className="hover:underline">Terms</Link>
             </nav>
-            <p className="text-sm opacity-70">
-              Made with <span className="text-red-500">❤️</span> and the power of AI.
-            </p>
           </div>
         </div>
       </footer>
