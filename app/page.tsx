@@ -200,7 +200,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="lg:absolute lg:left-[271px]">
             <div className="relative">
-              <span className="font-instrument-serif text-xl font-bold">flow</span>
+              <span className="font-instrument-serif text-xl font-bold text-orange-500"><i>goldfish</i></span>
             </div>
           </div>
 
@@ -224,7 +224,7 @@ export default function LandingPage() {
             Automate <span className="italic">intelligent</span> financial analysis
           </h1>
           <p className="text-xl text-center mb-12 font-instrument-sans">
-            Flow analyzes your financial data & provides insights you'd normally need an expert to uncover.
+            goldfish analyzes your financial data & provides insights you'd normally need an expert to uncover.
           </p>
 
           {/* User Description */}
@@ -286,13 +286,21 @@ export default function LandingPage() {
               className="mt-12 opacity-0 animate-fade-in min-h-[150vh] flex flex-col justify-center pb-[50vh]"
             >
               <div className="container mx-auto px-4">
-                <h2 className="text-2xl font-bold mb-6 text-center">Available flows</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <h2 className="text-2xl font-bold mb-6 text-center">
+                  {recommendations.length} goldfish found in your pond
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative">
+                  {/* Ripple Effect Container */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-full h-full bg-gradient-to-r from-orange-100 to-orange-50 opacity-0 animate-wave rounded-full"></div>
+                  </div>
+
+                  {/* Flow Cards */}
                   {recommendations.map((recommendation) => (
                     <Link 
                       key={recommendation.id}
                       href={`/flow/${recommendation.id}`}
-                      className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow transform hover:scale-105"
+                      className="bg-black text-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow transform hover:scale-105 relative z-10"
                       onClick={(e) => {
                         e.preventDefault();
                         document.body.style.overflow = 'hidden';
@@ -301,9 +309,9 @@ export default function LandingPage() {
                         }, 300);
                       }}
                     >
-                      <h3 className="text-lg font-semibold mb-2">{recommendation.title}</h3>
-                      <p className="text-sm text-gray-600">{recommendation.description}</p>
-                      <div className="mt-2 text-sm text-green-600">
+                      <h3 className="text-lg font-semibold mb-3 text-white">{recommendation.title}</h3>
+                      <p className="text-sm text-gray-300 mb-4">{recommendation.description}</p>
+                      <div className="mt-2 text-sm font-medium text-orange-500">
                         Potential savings: €{recommendation.potentialSavings}
                       </div>
                     </Link>
