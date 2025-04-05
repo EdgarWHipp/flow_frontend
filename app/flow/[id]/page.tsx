@@ -12,12 +12,13 @@ const FishPondGraphic = () => (
   <Box
     sx={{
       height: '33%',
-      width: '100%',
+      width: '90%',
       bgcolor: '#E3F2FD', // Light blue background
-      borderRadius: 2,
+      borderRadius: 10,
       mb: 3,
       position: 'relative',
       overflow: 'hidden',
+      marginY: '100px',
     }}
   >
     {/* Cute Fish 1 */}
@@ -106,40 +107,36 @@ export default function FlowPage() {
   const [loading, setLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
 
-  useEffect(() => {
-    const fetchFlow = async () => {
-      try {
-        if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') {
-          const mockFlow = MOCK_RECOMMENDATIONS.find(r => r.id === params.id)
-          setFlow(mockFlow || null)
-        } else {
-          const response = await fetch(`/api/flows/${params.id}`)
-          if (!response.ok) throw new Error('Failed to fetch flow')
-          const data = await response.json()
-          setFlow(data)
-        }
-      } catch (error) {
-        console.error('Error:', error)
-        const mockFlow = MOCK_RECOMMENDATIONS.find(r => r.id === params.id)
-        setFlow(mockFlow || null)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchFlow()
-  }, [params.id])
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setFile(event.target.files[0])
-      // Handle file upload logic here
-    }
-  }
+  useEffect(() => {
+    const fetchAnalysis = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/ai_snr_analysis", {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+  
+        const data = await response.json();
+        console.log('Analysis data:', data);
+        // Handle the data as needed
+      } catch (error) {
+        console.error('Error fetching analysis:', error);
+      }
+    };
+  
+    fetchAnalysis();
+  }, []);
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex' }}>
       {/* Sidebar */}
-      <Box sx={{ width: 200, bgcolor: 'background.paper', p: 2, boxShadow: 1, paddingTop: '60px'}}>
+      <Box sx={{ width: 200, bgcolor: 'background.paper', p: 2, boxShadow: 1, paddingTop: '60px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
           <Button
             startIcon={<ArrowBackIcon />}
@@ -151,19 +148,18 @@ export default function FlowPage() {
         <Button
           variant="outlined"
           component="label"
-          sx={{ width: '100%', height: 40 }}
+          sx={{ width: '90%', height: 80}}
         >
           {file ? file.name : 'Upload Portfolio Weights'}
           <input
             type="file"
             hidden
-            onChange={handleFileChange}
           />
         </Button>
       </Box>
 
       {/* Main content */}
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <AppBar position="fixed" elevation={1} sx={{ height: '50px' }}>
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -171,6 +167,12 @@ export default function FlowPage() {
             </Typography>
           </Toolbar>
         </AppBar>
+
+      {
+                loading ? (
+                  <FishPondGraphic />
+                ) : (
+                
 
         <Container maxWidth={false} sx={{ pt: 8 }}>
           <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', pt: 2 }}>
@@ -191,18 +193,12 @@ export default function FlowPage() {
                   justifyContent: 'center'
                 }}
               >
-                {loading ? (
-                  <FishPondGraphic />
-                ) : (
-                  <>
                     <Typography variant="h3" gutterBottom>
                       {flow?.title || 'Analysis Output'}
                     </Typography>
                     <Typography color="text.secondary" paragraph>
                       {flow?.description || 'Your analysis content will appear here.'}
                     </Typography>
-                  </>
-                )}
               </Paper>
             </Box>
 
@@ -219,7 +215,7 @@ export default function FlowPage() {
               />
             </Box>
           </Box>
-        </Container>
+        </Container>)}
       </Box>
     </Box>
   )
