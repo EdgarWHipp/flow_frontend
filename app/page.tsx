@@ -7,6 +7,8 @@ import { Recommendation } from '../types/api'
 import { MOCK_RECOMMENDATIONS } from '../mock/recommendations'
 
 const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+const T = process.env.NEXT_PUBLIC_T;
+const N = process.env.NEXT_PUBLIC_N;
 
 interface LoadingScreenProps {
   isVisible: boolean;
@@ -48,15 +50,6 @@ const LoadingScreen = ({ isVisible }: LoadingScreenProps) => {
 const getMockRecommendations = async (): Promise<Recommendation[]> => {
   await new Promise(resolve => setTimeout(resolve, 1500));
   return MOCK_RECOMMENDATIONS;
-};
-
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve((reader.result as string).split(',')[1]);
-    reader.onerror = error => reject(error);
-  });
 };
 
 export default function LandingPage() {
@@ -116,37 +109,25 @@ export default function LandingPage() {
     setIsLoading(true);
     try {
       if (IS_MOCK) {
+        console.log(IS_MOCK);
         const mockData = await getMockRecommendations();
         setRecommendations(mockData);
       } else {
-        const base64Content = await fileToBase64(fileToUpload);
-        const uploadResponse = await fetch('/api/documents', {
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
+        formData.append('T', T || '1.5');
+        formData.append('N', N || '1');
+        
+        const uploadResponse = await fetch('http://localhost:8000/matrix', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: fileToUpload.type,
-            content: base64Content,
-            metadata: {
-              filename: fileToUpload.name,
-              uploadedAt: new Date().toISOString(),
-              mimeType: fileToUpload.type,
-            },
-          }),
+          body: formData,
         });
 
         if (!uploadResponse.ok) {
           throw new Error('Document upload failed');
         }
-
-        const { documentId } = await uploadResponse.json();
-
-        const recommendationsResponse = await fetch(`/api/recommendations?documentId=${documentId}`);
-        if (!recommendationsResponse.ok) {
-          throw new Error('Failed to fetch recommendations');
-        }
-
-        const recommendationsData = await recommendationsResponse.json();
-        setRecommendations(recommendationsData);
+        console.log(uploadResponse);
+        setRecommendations(MOCK_RECOMMENDATIONS);
       }
     } catch (error) {
       console.error('Error processing file:', error);
