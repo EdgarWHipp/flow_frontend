@@ -1,206 +1,226 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Box, Paper, Typography, Container, AppBar, Toolbar, Button } from '@mui/material'
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Recommendation } from '../../../types/api'
 import { MOCK_RECOMMENDATIONS } from '../../../mock/recommendations'
-import Link from 'next/link'
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { motion, AnimatePresence } from "framer-motion"
 
-// Add environment check
-const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+const FishPondGraphic = () => (
+  <Box
+    sx={{
+      height: '33%',
+      width: '100%',
+      bgcolor: '#E3F2FD', // Light blue background
+      borderRadius: 2,
+      mb: 3,
+      position: 'relative',
+      overflow: 'hidden',
+    }}
+  >
+    {/* Cute Fish 1 */}
+    <Box
+      sx={{
+        position: 'absolute',
+        width: 40,
+        height: 20,
+        bgcolor: '#FFB6C1', // Light pink
+        borderRadius: '50%',
+        animation: 'swim1 8s linear infinite',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          right: -12,
+          top: 5,
+          width: 0,
+          height: 0,
+          borderTop: '6px solid transparent',
+          borderLeft: '12px solid #FFB6C1',
+          borderBottom: '6px solid transparent',
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          left: 8,
+          top: 4,
+          width: 4,
+          height: 4,
+          bgcolor: 'white',
+          borderRadius: '50%',
+        },
+        '@keyframes swim1': {
+          '0%': { left: '-5%', top: '20%' },
+          '50%': { left: '100%', top: '60%' },
+          '50.1%': { left: '100%', transform: 'scaleX(-1)' },
+          '100%': { left: '-5%', top: '20%', transform: 'scaleX(-1)' }
+        }
+      }}
+    />
+
+    {/* Cute Fish 2 */}
+    <Box
+      sx={{
+        position: 'absolute',
+        width: 35,
+        height: 18,
+        bgcolor: '#87CEFA', // Light sky blue
+        borderRadius: '50%',
+        animation: 'swim2 12s linear infinite',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          right: -10,
+          top: 4,
+          width: 0,
+          height: 0,
+          borderTop: '5px solid transparent',
+          borderLeft: '10px solid #87CEFA',
+          borderBottom: '5px solid transparent',
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          left: 6,
+          top: 3,
+          width: 3,
+          height: 3,
+          bgcolor: 'white',
+          borderRadius: '50%',
+        },
+        '@keyframes swim2': {
+          '0%': { right: '-5%', top: '40%' },
+          '50%': { right: '100%', top: '30%' },
+          '50.1%': { right: '100%', transform: 'scaleX(-1)' },
+          '100%': { right: '-5%', top: '40%', transform: 'scaleX(-1)' }
+        }
+      }}
+    />
+  </Box>
+)
 
 export default function FlowPage() {
   const params = useParams()
   const [flow, setFlow] = useState<Recommendation | null>(null)
   const [loading, setLoading] = useState(true)
-  const [selectedStep, setSelectedStep] = useState<number | null>(null)
+  const [file, setFile] = useState<File | null>(null)
 
   useEffect(() => {
     const fetchFlow = async () => {
       try {
-        if (IS_MOCK) {
-          // Use mock data
+        if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') {
           const mockFlow = MOCK_RECOMMENDATIONS.find(r => r.id === params.id)
           setFlow(mockFlow || null)
         } else {
-          // Real API implementation
-          const response = await fetch(`/api/flows/${params.id}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch flow');
-          }
-          const data = await response.json();
-          setFlow(data);
+          const response = await fetch(`/api/flows/${params.id}`)
+          if (!response.ok) throw new Error('Failed to fetch flow')
+          const data = await response.json()
+          setFlow(data)
         }
       } catch (error) {
-        console.error('Error fetching flow:', error)
-        // Fallback to mock data
+        console.error('Error:', error)
         const mockFlow = MOCK_RECOMMENDATIONS.find(r => r.id === params.id)
         setFlow(mockFlow || null)
       } finally {
         setLoading(false)
       }
     }
-
     fetchFlow()
   }, [params.id])
 
-  const handleStepClick = (index: number) => {
-    setSelectedStep(selectedStep === index ? null : index)
-  }
-
-  const StepContent = ({ step, requirements }: { step: string, requirements: string[] }) => (
-    <div className="bg-white rounded-lg p-6 shadow-md h-full">
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-4">Expected Return</h3>
-        <p className="text-gray-600">{step}</p>
-      </div>
-
-      <div className="mb-6">
-        <h4 className="font-semibold mb-2">Documents needed:</h4>
-        <ul className="list-disc pl-5 space-y-2">
-          {requirements.map((req, idx) => (
-            <li key={idx} className="text-gray-700">{req}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Upload Document
-          </label>
-          <input
-            type="file"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Additional Notes
-          </label>
-          <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            rows={4}
-          />
-        </div>
-
-        <button className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors">
-          Submit
-        </button>
-      </div>
-    </div>
-  )
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f3f1ea] flex items-center justify-center">
-        <div className="text-xl font-semibold">Loading...</div>
-      </div>
-    )
-  }
-
-  if (!flow) {
-    return (
-      <div className="min-h-screen bg-[#f3f1ea] flex items-center justify-center">
-        <div className="text-xl font-semibold">Flow not found</div>
-      </div>
-    )
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setFile(event.target.files[0])
+      // Handle file upload logic here
+    }
   }
 
   return (
-    <main className="min-h-screen bg-[#f3f1ea]">
-      {/* Fixed header bar */}
-      <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
-        <div className="max-w-7xl mx-auto px-8 h-16 flex items-center">
-          <Link 
-            href="/" 
-            className="text-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2"
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex' }}>
+      {/* Sidebar */}
+      <Box sx={{ width: 200, bgcolor: 'background.paper', p: 2, boxShadow: 1, paddingTop: '60px'}}>
+        <Link href="/" style={{ textDecoration: 'none' }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            sx={{ mb: 2, width: '100%', justifyContent: 'flex-start' }}
           >
-            <ChevronLeft className="w-5 h-5" />
-            <span>Back to recommendations</span>
-          </Link>
-        </div>
-      </div>
+            Back to recommendations
+          </Button>
+        </Link>
+        <Button
+          variant="outlined"
+          component="label"
+          sx={{ width: '100%', height: 40 }}
+        >
+          {file ? file.name : 'Upload Portfolio Weights'}
+          <input
+            type="file"
+            hidden
+            onChange={handleFileChange}
+          />
+        </Button>
+      </Box>
 
-      {/* Main content with top padding to account for fixed header */}
-      <div className="pt-16">
-        <div className="max-w-7xl mx-auto p-8">
-          <div className="flex gap-8">
-            {/* Left sidebar with steps - updated for single step */}
-            <div className="w-1/3">
-              <div className="sticky top-24 h-[calc(100vh-8rem)] flex items-center">
-                <div className="relative w-full">
-                  <AnimatePresence>
-                    {flow.relatedFlows[0]?.return && (
-                      <motion.div
-                        key="single-step"
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{
-                          opacity: selectedStep === 0 ? 1 : 0.5,
-                          y: 0,
-                          scale: selectedStep === 0 ? 1.1 : 0.9,
-                        }}
-                        exit={{ opacity: 0, y: 50 }}
-                        transition={{ duration: 0.3 }}
-                        className={`
-                          absolute w-full
-                          ${selectedStep === 0 ? 'relative z-10' : 'z-0'}
-                        `}
-                      >
-                        <button
-                          onClick={() => setSelectedStep(0)}
-                          className={`
-                            w-full text-left p-4 rounded-lg transition-all
-                            ${selectedStep === 0 ? 
-                              'bg-white border-2 border-blue-500 shadow-xl' : 
-                              'bg-white hover:bg-gray-50 border-2 border-transparent'
-                            }
-                          `}
-                        >
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                              1
-                            </div>
-                            <p className="ml-4 font-medium text-gray-800">
-                              {flow.relatedFlows[0].return}
-                            </p>
-                          </div>
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </div>
+      {/* Main content */}
+      <Box sx={{ flex: 1 }}>
+        <AppBar position="fixed" elevation={1} sx={{ height: '50px' }}>
+          <Toolbar>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              Flow Analysis
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
-            {/* Right side content */}
-            <div className="flex-1">
-              {selectedStep !== null ? (
-                <StepContent 
-                  step={flow.relatedFlows[0]?.return}
-                  requirements={flow.relatedFlows[0]?.requirements}
-                />
-              ) : (
-                <div className="bg-white rounded-lg p-6 shadow-md">
-                  <h1 className="text-3xl font-bold mb-4">{flow.title}</h1>
-                  <p className="text-gray-600 mb-6">{flow.description}</p>
-                  
-                  
+        <Container maxWidth={false} sx={{ pt: 8 }}>
+          <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', pt: 2 }}>
+            {/* Left side - Output area with fish pond graphic */}
+            <Box sx={{ width: '66.666%', p: 2 }}>
+              <Paper 
+                elevation={0}
+                sx={{ 
+                  height: '100%', 
+                  p: 3,
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {loading ? (
+                  <FishPondGraphic />
+                ) : (
+                  <>
+                    <Typography variant="h3" gutterBottom>
+                      {flow?.title || 'Analysis Output'}
+                    </Typography>
+                    <Typography color="text.secondary" paragraph>
+                      {flow?.description || 'Your analysis content will appear here.'}
+                    </Typography>
+                  </>
+                )}
+              </Paper>
+            </Box>
 
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-blue-800">
-                      Select a step from the left to get started
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+            {/* Right side - LibreChat */}
+            <Box sx={{ width: '33.333%', p: 2 }}>
+              <iframe 
+                src="http://localhost:3080"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  borderRadius: '8px'
+                }}
+              />
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+    </Box>
   )
-} 
+}
