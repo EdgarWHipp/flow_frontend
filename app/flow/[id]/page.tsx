@@ -188,10 +188,7 @@ export default function FlowPage() {
                   <h1 className="text-3xl font-bold mb-4">{flow.title}</h1>
                   <p className="text-gray-600 mb-6">{flow.description}</p>
                   
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Potential Savings</h2>
-                    <p className="text-green-600 text-2xl font-bold">€{flow.potentialSavings}</p>
-                  </div>
+                  
 
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <p className="text-blue-800">

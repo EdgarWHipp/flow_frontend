@@ -19,6 +19,5 @@ export interface Recommendation {
   title: string;
   description: string;
   priority: number;
-  potentialSavings: number;
   relatedFlows: RelatedFlow[];
 } 

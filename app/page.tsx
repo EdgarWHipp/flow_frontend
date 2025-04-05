@@ -8,7 +8,11 @@ import { MOCK_RECOMMENDATIONS } from '../mock/recommendations'
 
 const IS_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
-const LoadingScreen = ({ isVisible }) => {
+interface LoadingScreenProps {
+  isVisible: boolean;
+}
+
+const LoadingScreen = ({ isVisible }: LoadingScreenProps) => {
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
@@ -17,7 +21,7 @@ const LoadingScreen = ({ isVisible }) => {
     } else {
       const timer = setTimeout(() => {
         setShouldRender(false);
-      }, 300); // Match this with the CSS transition duration
+     }, 300); // Match this with the CSS transition duration
       return () => clearTimeout(timer);
     }
   }, [isVisible]);
@@ -60,7 +64,6 @@ export default function LandingPage() {
   const [isDragging, setIsDragging] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isUseCasesOpen, setIsUseCasesOpen] = useState(false)
-  const [userDescription, setUserDescription] = useState("")
   const useCasesRef = useRef<HTMLDivElement>(null)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
   const [isScrolledDown, setIsScrolledDown] = useState(false);
@@ -227,18 +230,6 @@ export default function LandingPage() {
             goldfish analyzes your financial data & provides insights you'd normally need an expert to uncover.
           </p>
 
-          {/* User Description */}
-          <div className="mb-8">
-            <textarea
-              id="userDescription"
-              rows={4}
-              className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-blue-500"
-              placeholder="Briefly describe your role and what you're looking to achieve financially"
-              value={userDescription}
-              onChange={(e) => setUserDescription(e.target.value)}
-            ></textarea>
-          </div>
-
           {/* File Upload Area */}
           <div 
             className={`transition-opacity duration-500 ${
@@ -249,20 +240,18 @@ export default function LandingPage() {
               {!file ? (
                 <>
                   <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-4 text-lg font-semibold">Drag and drop your file here, or click to select</p>
-                  <p className="mt-2 text-sm text-gray-500">Upload your PDFs, Excel sheets, or Obsidian.md files</p>
                   <input
                     type="file"
                     className="hidden"
                     onChange={handleFileChange}
                     id="fileInput"
-                    accept=".pdf,.xlsx,.xls,.md"
+                    accept=".csv"
                   />
                   <label
                     htmlFor="fileInput"
                     className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
                   >
-                    Select File
+                    Select Matrix
                   </label>
                 </>
               ) : (
@@ -287,7 +276,7 @@ export default function LandingPage() {
             >
               <div className="container mx-auto px-4">
                 <h2 className="text-2xl font-bold mb-6 text-center">
-                  {recommendations.length} <span className="font-instrument-serif font-bold text-orange-500"><i>goldfish</i></span> found in your pond
+                  {recommendations.length} <span className="font-instrument-serif font-bold text-orange-500"><i>analyses</i></span> availabe
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative">
                   {/* Ripple Effect Container */}
@@ -312,7 +301,7 @@ export default function LandingPage() {
                       <h3 className="text-lg font-semibold mb-3 text-white">{recommendation.title}</h3>
                       <p className="text-sm text-gray-300 mb-4">{recommendation.description}</p>
                       <div className="mt-2 text-sm font-medium text-orange-500">
-                        Potential savings: €{recommendation.potentialSavings}
+                        
                       </div>
                     </Link>
                   ))}
